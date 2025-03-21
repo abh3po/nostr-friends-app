@@ -33,7 +33,7 @@ export const useNostr = () => {
                 const innerEvent = JSON.parse(innerJson);
                 console.log("GOT GIFT WRAP FROM", innerEvent.pubkey)
                 if (innerEvent.kind === 13) {
-                  const rumorJson = await window.nostr!.nip44!.decrypt(userPubkey, innerEvent.content);
+                  const rumorJson = await window.nostr!.nip44!.decrypt(innerEvent.pubkey, innerEvent.content);
                   const rumor = JSON.parse(rumorJson);
                   console.log("FOUND RUMOR KEY!!!!!!!!!", rumor)
                   if (rumor.kind === 21) {
