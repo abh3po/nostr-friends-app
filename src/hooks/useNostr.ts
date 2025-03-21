@@ -11,6 +11,7 @@ export const useNostr = () => {
   const [pubkey, setPubkey] = useState<string>('');
   const [relay, setRelay] = useState<Relay | null>(null);
   const [viewKey, setViewKey] = useState<string>('');
+  const [viewKeyMap, setViewKeyMap] = useState<Map<string, string>>(new Map());
 
   useEffect(() => {
     const r = new Relay('wss://relay.damus.io');
@@ -26,19 +27,25 @@ export const useNostr = () => {
           // Check for existing view key
           r.subscribe([{ kinds: [1059], '#p': [userPubkey] }], {
             onevent: async (e) => {
-              console.log("FOUND EVENT", e)
               try {
                 const encryptedInner = e.content;
                 const innerJson = await window.nostr!.nip44!.decrypt(userPubkey, encryptedInner);
                 const innerEvent = JSON.parse(innerJson);
-                console.log("FOUND SEAL EVENT as", innerEvent)
                 if (innerEvent.kind === 13) {
                   const rumorJson = await window.nostr!.nip44!.decrypt(userPubkey, innerEvent.content);
                   const rumor = JSON.parse(rumorJson);
+                  console.log("FOUND RUMOR KEY!!!!!!!!!", rumor)
                   if (rumor.kind === 21) {
                     const viewKeyTag = rumor.tags.find((t: string[]) => t[0] === 'key' && t[1] === 'view');
                     if (viewKeyTag) {
-                      setViewKey(viewKeyTag[2]);
+                      setViewKeyMap((prev) => {
+                        const newMap = new Map(prev);
+                        newMap.set(rumor.pubkey, viewKeyTag[2]);
+                        return newMap;
+                      })
+                    }
+                    if(rumor.pubkey === pubkey){
+                      setViewKey(viewKeyTag[2])
                     }
                   }
                 }
@@ -47,7 +54,7 @@ export const useNostr = () => {
               }
             },
             oneose: () => {
-              if (!viewKey) console.log('No view key found; user needs to generate one.');
+              if (!viewKeyMap.get(userPubkey)) console.log('No view key found; user needs to generate one.');
             },
           });
         } catch (error) {
@@ -121,5 +128,5 @@ export const useNostr = () => {
     console.log('View key generated and stored');
   };
 
-  return { pubkey, relay, login, viewKey, generateViewKey };
+  return { pubkey, relay, login, viewKey, generateViewKey, viewKeyMap };
 };

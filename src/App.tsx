@@ -15,7 +15,7 @@ declare global {
 }
 
 const App: React.FC = () => {
-  const { pubkey, relay, login, viewKey, generateViewKey } = useNostr();
+  const { pubkey, relay, login, viewKey, generateViewKey, viewKeyMap } = useNostr();
   const [friends, setFriends] = useState<string[]>(() => JSON.parse(localStorage.getItem('friends') || '[]'));
   const [posts, setPosts] = useState<any[]>([]);
 
@@ -32,7 +32,7 @@ const App: React.FC = () => {
           <>
             <AddFriend relay={relay} pubkey={pubkey} viewKey={viewKey} setFriends={setFriends} friends={friends} />
             <CreatePost relay={relay} pubkey={pubkey} friends={friends} viewKey={viewKey} />
-            <PostList relay={relay} friends={friends} setPosts={setPosts} pubkey={pubkey} viewKey={viewKey} posts={posts} />
+            <PostList relay={relay} friends={friends} setPosts={setPosts} pubkey={pubkey} viewKey={viewKey} posts={posts} viewKeyMap={viewKeyMap} />
             <p>Your pubkey: {nip19.npubEncode(pubkey)}...</p>
           </>
         ) : (

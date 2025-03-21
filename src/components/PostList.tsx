@@ -10,6 +10,7 @@ interface PostListProps {
   setPosts: React.Dispatch<React.SetStateAction<DecryptedEvent[]>>;
   pubkey: string;
   viewKey: string;
+  viewKeyMap: Map<string, string>
   posts: DecryptedEvent[]
 }
 
@@ -19,9 +20,11 @@ const PostList: React.FC<PostListProps> = ({
   setPosts,
   pubkey,
   viewKey,
+  viewKeyMap,
   posts
 }) => {
   useEffect(() => {
+    console.log("VIEW KEY MAP IS", viewKeyMap)
     if (!relay || !friends.length || !window.nostr) return;
     console.log("GETTING POST FROM FRIENDS", friends);
     const sub = relay.subscribe(
@@ -33,7 +36,9 @@ const PostList: React.FC<PostListProps> = ({
           console.log("GOT A FRIENDS POST!", e);
           try {
             // Decrypt with viewKey as a symmetric key
-            let UIntViewKey = hexToBytes(viewKey);
+            let viewKeyHex = viewKeyMap.get(e.pubkey)
+            if(!viewKeyHex) throw Error("FRIENDS KEY NOT FOUND IN VIEW KEY MAP")
+            let UIntViewKey = hexToBytes(viewKeyHex!);
             let conversationKey = nip44.getConversationKey(
               UIntViewKey,
               getPublicKey(UIntViewKey)
