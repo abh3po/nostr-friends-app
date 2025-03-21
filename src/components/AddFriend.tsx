@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Relay, UnsignedEvent, generateSecretKey, getPublicKey, getEventHash, finalizeEvent } from 'nostr-tools';
+import { Relay, UnsignedEvent, generateSecretKey, getPublicKey, getEventHash, finalizeEvent, nip19 } from 'nostr-tools';
 import { decode } from 'nostr-tools/nip19';
 
 interface AddFriendProps {
@@ -7,9 +7,10 @@ interface AddFriendProps {
   pubkey: string;
   viewKey: string;
   setFriends: React.Dispatch<React.SetStateAction<string[]>>;
+  friends: string[];
 }
 
-const AddFriend: React.FC<AddFriendProps> = ({ relay, pubkey, viewKey, setFriends }) => {
+const AddFriend: React.FC<AddFriendProps> = ({ relay, pubkey, viewKey, setFriends, friends }) => {
   const [newFriend, setNewFriend] = useState('');
 
   const addFriend = async () => {
@@ -55,6 +56,7 @@ const AddFriend: React.FC<AddFriendProps> = ({ relay, pubkey, viewKey, setFriend
       relay.publish(signedWrap);
       console.log('Wrapped and published to relay:', signedWrap);
       setFriends((prev) => {
+        console.log("SETTING NEW FRIENDS", prev, hexPubkey)
         if (prev.includes(hexPubkey)) return prev;
         const updatedFriends = [...prev, hexPubkey];
 
@@ -80,8 +82,8 @@ const AddFriend: React.FC<AddFriendProps> = ({ relay, pubkey, viewKey, setFriend
       />
       <button onClick={addFriend}>Add</button>
       <ul>
-        {setFriends && Array.isArray(setFriends) && setFriends.map((f) => (
-          <li key={f}>{f.slice(0, 8)}...</li>
+        {friends && Array.isArray(friends) && friends.map((f) => (
+          <li key={f}>{nip19.npubEncode(f).slice(0, 16)}...</li>
         ))}
       </ul>
     </div>

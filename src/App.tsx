@@ -6,6 +6,7 @@ import { useNostr } from './hooks/useNostr';
 import './App.css';
 
 import type { WindowNostr } from 'nostr-tools/nip07'
+import { nip19 } from 'nostr-tools';
 
 declare global {
   interface Window {
@@ -19,6 +20,7 @@ const App: React.FC = () => {
   const [posts, setPosts] = useState<any[]>([]);
 
   useEffect(() => {
+    console.log("WE HAVE NEW FRIENDS")
     localStorage.setItem('friends', JSON.stringify(friends));
   }, [friends]);
 
@@ -28,10 +30,10 @@ const App: React.FC = () => {
       {pubkey ? (
         viewKey ? (
           <>
-            <AddFriend relay={relay} pubkey={pubkey} viewKey={viewKey} setFriends={setFriends} />
+            <AddFriend relay={relay} pubkey={pubkey} viewKey={viewKey} setFriends={setFriends} friends={friends} />
             <CreatePost relay={relay} pubkey={pubkey} friends={friends} viewKey={viewKey} />
-            <PostList relay={relay} friends={friends} setPosts={setPosts} pubkey={pubkey} viewKey={viewKey} />
-            <p>Your pubkey: {pubkey.slice(0, 8)}...</p>
+            <PostList relay={relay} friends={friends} setPosts={setPosts} pubkey={pubkey} viewKey={viewKey} posts={posts} />
+            <p>Your pubkey: {nip19.npubEncode(pubkey)}...</p>
           </>
         ) : (
           <div>
