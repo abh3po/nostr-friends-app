@@ -9,17 +9,15 @@ interface CreatePostProps {
   viewKey: string;
 }
 
-const CreatePost: React.FC<CreatePostProps> = ({ relay, pubkey, friends, viewKey }) => {
+const CreatePost: React.FC<CreatePostProps> = ({ relay, pubkey, viewKey }) => {
   const [postContent, setPostContent] = useState('');
   const createPrivatePost = async () => {
     if (!relay || !postContent || !window.nostr) return;
 
-    // Use viewKey as a symmetric key with NIP-44 for post content
-    let UIntViewKey = hexToBytes(viewKey);
-    let conversationKey = nip44.getConversationKey(UIntViewKey, getPublicKey(UIntViewKey) );
+    const UIntViewKey = hexToBytes(viewKey);
+    const conversationKey = nip44.getConversationKey(UIntViewKey, getPublicKey(UIntViewKey) );
     const encryptedContent = nip44.encrypt(postContent, conversationKey) ;
 
-    // Create the public post event
     const postEvent: UnsignedEvent = {
       kind: 9876,
       pubkey,
