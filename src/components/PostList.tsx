@@ -29,13 +29,12 @@ const PostList: React.FC<PostListProps> = ({
     console.log("GETTING POST FROM FRIENDS", friends);
     const sub = relay.subscribe(
       [
-        { kinds: [9876], authors: friends }, // Posts from friends
+        { kinds: [9876], authors: friends },
       ],
       {
         onevent: async (e) => {
           console.log("GOT A FRIENDS POST!", e);
           try {
-            // Decrypt with viewKey as a symmetric key
             let viewKeyHex = viewKeyMap.get(e.pubkey)
             if(!viewKeyHex) throw Error("FRIENDS KEY NOT FOUND IN VIEW KEY MAP")
             let UIntViewKey = hexToBytes(viewKeyHex!);

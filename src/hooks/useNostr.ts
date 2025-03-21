@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Relay, UnsignedEvent, generateSecretKey, getPublicKey, getEventHash, finalizeEvent } from 'nostr-tools';
+import { Relay, UnsignedEvent, generateSecretKey, getPublicKey, getEventHash, finalizeEvent, nip44 } from 'nostr-tools';
 
 const generateRandomViewKey = () => {
   return Array.from(crypto.getRandomValues(new Uint8Array(32)))
@@ -29,8 +29,9 @@ export const useNostr = () => {
             onevent: async (e) => {
               try {
                 const encryptedInner = e.content;
-                const innerJson = await window.nostr!.nip44!.decrypt(userPubkey, encryptedInner);
+                const innerJson = await window.nostr!.nip44!.decrypt(e.pubkey, encryptedInner);
                 const innerEvent = JSON.parse(innerJson);
+                console.log("GOT GIFT WRAP FROM", innerEvent.pubkey)
                 if (innerEvent.kind === 13) {
                   const rumorJson = await window.nostr!.nip44!.decrypt(userPubkey, innerEvent.content);
                   const rumor = JSON.parse(rumorJson);
@@ -65,7 +66,7 @@ export const useNostr = () => {
     tryAutoLogin();
 
     return () => {
-      r.close();
+      //r.close();
     };
   }, [pubkey]);
 
@@ -113,7 +114,8 @@ export const useNostr = () => {
     // Wrap (Kind 1059, signed with ephemeral key)
     const ephemeralPrivateKey = generateSecretKey();
     const ephemeralPubkey = getPublicKey(ephemeralPrivateKey);
-    const encryptedSeal = await window.nostr.nip44!.encrypt(pubkey, JSON.stringify(signedSeal));
+    let conversationKey = nip44.getConversationKey(ephemeralPrivateKey, pubkey)
+    const encryptedSeal = nip44!.encrypt(JSON.stringify(signedSeal), conversationKey);
     const wrapEvent: UnsignedEvent = {
       kind: 1059,
       pubkey: ephemeralPubkey,

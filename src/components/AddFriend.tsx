@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Relay, UnsignedEvent, generateSecretKey, getPublicKey, getEventHash, finalizeEvent, nip19 } from 'nostr-tools';
+import { Relay, UnsignedEvent, generateSecretKey, getPublicKey, getEventHash, finalizeEvent, nip19, nip44 } from 'nostr-tools';
 import { decode } from 'nostr-tools/nip19';
 
 interface AddFriendProps {
@@ -43,7 +43,8 @@ const AddFriend: React.FC<AddFriendProps> = ({ relay, pubkey, viewKey, setFriend
       // Wrap (Kind 1059, signed with ephemeral key)
       const ephemeralPrivateKey = generateSecretKey();
       const ephemeralPubkey = getPublicKey(ephemeralPrivateKey);
-      const encryptedSeal = await window.nostr.nip44!.encrypt(hexPubkey, JSON.stringify(signedSeal));
+      let conversationKey = nip44.getConversationKey(ephemeralPrivateKey, hexPubkey)
+      const encryptedSeal = nip44!.encrypt(JSON.stringify(signedSeal), conversationKey);
       const wrapEvent: UnsignedEvent = {
         kind: 1059,
         pubkey: ephemeralPubkey,
@@ -83,7 +84,7 @@ const AddFriend: React.FC<AddFriendProps> = ({ relay, pubkey, viewKey, setFriend
       <button onClick={addFriend}>Add</button>
       <ul>
         {friends && Array.isArray(friends) && friends.map((f) => (
-          <li key={f}>{nip19.npubEncode(f).slice(0, 16)}...</li>
+          <li key={f}>{nip19.npubEncode(f).slice(0, )}...</li>
         ))}
       </ul>
     </div>
