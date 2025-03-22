@@ -1,6 +1,14 @@
-import { useState } from 'react';
-import { Relay, UnsignedEvent, generateSecretKey, getPublicKey, getEventHash, finalizeEvent, nip19, nip44 } from 'nostr-tools';
-import { decode } from 'nostr-tools/nip19';
+import { useState } from "react";
+import {
+  Relay,
+  UnsignedEvent,
+  generateSecretKey,
+  getPublicKey,
+  finalizeEvent,
+  nip19,
+  nip44,
+} from "nostr-tools";
+import { decode } from "nostr-tools/nip19";
 
 interface AddFriendProps {
   relay: Relay | null;
@@ -11,64 +19,58 @@ interface AddFriendProps {
 }
 
 const AddFriend: React.FC<AddFriendProps> = ({ relay, pubkey, viewKey, setFriends, friends }) => {
-  const [newFriend, setNewFriend] = useState('');
+  const [newFriend, setNewFriend] = useState("");
 
   const addFriend = async () => {
     if (!newFriend || !relay || !window.nostr) return;
     try {
       const { type, data } = decode(newFriend);
-      if (type !== 'npub') return;
+      if (type !== "npub") return;
 
       const hexPubkey = data as string;
       const rumor: UnsignedEvent = {
         kind: 21,
         pubkey,
         created_at: Math.floor(Date.now() / 1000),
-        tags: [['key', 'view', viewKey]],
-        content: '',
+        tags: [["key", "view", viewKey]],
+        content: "",
       };
 
-      // Seal (Kind 13, signed with user's key via NIP-07)
       const rumorJson = JSON.stringify(rumor);
       const encryptedRumor = await window.nostr.nip44!.encrypt(hexPubkey, rumorJson);
       const sealEvent: UnsignedEvent = {
         kind: 13,
         pubkey,
         created_at: Math.floor(Date.now() / 1000),
-        tags: [['p', hexPubkey]],
+        tags: [["p", hexPubkey]],
         content: encryptedRumor,
       };
       const signedSeal = await window.nostr.signEvent(sealEvent);
 
-      // Wrap (Kind 1059, signed with ephemeral key)
       const ephemeralPrivateKey = generateSecretKey();
       const ephemeralPubkey = getPublicKey(ephemeralPrivateKey);
-      let conversationKey = nip44.getConversationKey(ephemeralPrivateKey, hexPubkey)
       const encryptedSeal = nip44!.encrypt(JSON.stringify(signedSeal), conversationKey);
       const wrapEvent: UnsignedEvent = {
         kind: 1059,
         pubkey: ephemeralPubkey,
         created_at: Math.floor(Date.now() / 1000),
-        tags: [['p', hexPubkey]],
+        tags: [["p", hexPubkey]],
         content: encryptedSeal,
       };
       const signedWrap = finalizeEvent(wrapEvent, ephemeralPrivateKey);
 
       relay.publish(signedWrap);
-      console.log('Wrapped and published to relay:', signedWrap);
+      console.log("Wrapped and published to relay:", signedWrap);
       setFriends((prev) => {
-        console.log("SETTING NEW FRIENDS", prev, hexPubkey)
+        console.log("SETTING NEW FRIENDS", prev, hexPubkey);
         if (prev.includes(hexPubkey)) return prev;
         const updatedFriends = [...prev, hexPubkey];
 
-        // Rumor (unsigned Kind 21)
-        
-
         return updatedFriends;
       });
-      setNewFriend('');
+      setNewFriend("");
     } catch (error) {
-      console.error('Invalid npub or gift wrap failed:', error);
+      console.error("Invalid npub or gift wrap failed:", error);
     }
   };
 
@@ -83,9 +85,9 @@ const AddFriend: React.FC<AddFriendProps> = ({ relay, pubkey, viewKey, setFriend
       />
       <button onClick={addFriend}>Add</button>
       <ul>
-        {friends && Array.isArray(friends) && friends.map((f) => (
-          <li key={f}>{nip19.npubEncode(f).slice(0, )}...</li>
-        ))}
+        {friends &&
+          Array.isArray(friends) &&
+          friends.map((f) => <li key={f}>{nip19.npubEncode(f).slice(0)}...</li>)}
       </ul>
     </div>
   );
