@@ -18,7 +18,13 @@ interface AddFriendProps {
   friends: string[];
 }
 
-const AddFriend: React.FC<AddFriendProps> = ({ relay, pubkey, viewKey, setFriends, friends }) => {
+const AddFriend: React.FC<AddFriendProps> = ({
+  relay,
+  pubkey,
+  viewKey,
+  setFriends,
+  friends,
+}) => {
   const [newFriend, setNewFriend] = useState("");
 
   const addFriend = async () => {
@@ -37,7 +43,10 @@ const AddFriend: React.FC<AddFriendProps> = ({ relay, pubkey, viewKey, setFriend
       };
 
       const rumorJson = JSON.stringify(rumor);
-      const encryptedRumor = await window.nostr.nip44!.encrypt(hexPubkey, rumorJson);
+      const encryptedRumor = await window.nostr.nip44!.encrypt(
+        hexPubkey,
+        rumorJson
+      );
       const sealEvent: UnsignedEvent = {
         kind: 13,
         pubkey,
@@ -49,7 +58,14 @@ const AddFriend: React.FC<AddFriendProps> = ({ relay, pubkey, viewKey, setFriend
 
       const ephemeralPrivateKey = generateSecretKey();
       const ephemeralPubkey = getPublicKey(ephemeralPrivateKey);
-      const encryptedSeal = nip44!.encrypt(JSON.stringify(signedSeal), conversationKey);
+      let conversationKey = nip44!.getConversationKey(
+        ephemeralPrivateKey,
+        hexPubkey
+      );
+      const encryptedSeal = nip44!.encrypt(
+        JSON.stringify(signedSeal),
+        conversationKey
+      );
       const wrapEvent: UnsignedEvent = {
         kind: 1059,
         pubkey: ephemeralPubkey,
@@ -87,7 +103,9 @@ const AddFriend: React.FC<AddFriendProps> = ({ relay, pubkey, viewKey, setFriend
       <ul>
         {friends &&
           Array.isArray(friends) &&
-          friends.map((f) => <li key={f}>{nip19.npubEncode(f).slice(0)}...</li>)}
+          friends.map((f) => (
+            <li key={f}>{nip19.npubEncode(f).slice(0)}...</li>
+          ))}
       </ul>
     </div>
   );

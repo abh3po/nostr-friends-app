@@ -14,11 +14,15 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ pubkey, viewKey }) => {
     <div className="space-y-6">
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-800">Account Settings</h2>
+          <h2 className="text-xl font-semibold text-gray-800">
+            Account Settings
+          </h2>
         </div>
         <div className="p-6 space-y-6">
           <div>
-            <h3 className="text-lg font-medium text-gray-800 mb-3">Your Nostr Identity</h3>
+            <h3 className="text-lg font-medium text-gray-800 mb-3">
+              Your Nostr Identity
+            </h3>
             <div className="bg-gray-50 p-4 rounded-md">
               <div className="mb-3">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -48,8 +52,8 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ pubkey, viewKey }) => {
                   </button>
                 </div>
                 <p className="mt-1 text-xs text-gray-500">
-                  This is your public identifier on Nostr. Share it with others so they can add you
-                  as a friend.
+                  This is your public identifier on Nostr. Share it with others
+                  so they can add you as a friend.
                 </p>
               </div>
 
@@ -112,19 +116,26 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ pubkey, viewKey }) => {
                   </button>
                 </div>
                 <p className="mt-1 text-xs text-gray-500">
-                  Your view key is used to encrypt and decrypt private posts. Keep it secure.
+                  Your view key is used to encrypt and decrypt private posts.
+                  Keep it secure.
                 </p>
               </div>
             </div>
           </div>
 
           <div>
-            <h3 className="text-lg font-medium text-gray-800 mb-3">App Preferences</h3>
+            <h3 className="text-lg font-medium text-gray-800 mb-3">
+              App Preferences
+            </h3>
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="text-sm font-medium text-gray-700">Dark Mode</h4>
-                  <p className="text-xs text-gray-500">Switch between light and dark themes</p>
+                  <h4 className="text-sm font-medium text-gray-700">
+                    Dark Mode
+                  </h4>
+                  <p className="text-xs text-gray-500">
+                    Switch between light and dark themes
+                  </p>
                 </div>
                 <div className="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
                   <input
@@ -142,8 +153,12 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ pubkey, viewKey }) => {
 
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="text-sm font-medium text-gray-700">Notifications</h4>
-                  <p className="text-xs text-gray-500">Enable or disable notifications</p>
+                  <h4 className="text-sm font-medium text-gray-700">
+                    Notifications
+                  </h4>
+                  <p className="text-xs text-gray-500">
+                    Enable or disable notifications
+                  </p>
                 </div>
                 <div className="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
                   <input
@@ -165,10 +180,13 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ pubkey, viewKey }) => {
       </div>
 
       <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-medium text-gray-800 mb-4">About Nostrbook</h3>
+        <h3 className="text-lg font-medium text-gray-800 mb-4">
+          About nostrfriends
+        </h3>
         <p className="text-gray-600 mb-3">
-          Nostrbook is a decentralized social media platform built on the Nostr protocol. Your data
-          is encrypted and only accessible to you and your friends.
+          nostrfriends is a decentralized social media platform built on the
+          Nostr protocol. Your data is encrypted and only accessible to you and
+          your friends.
         </p>
         <p className="text-sm text-gray-500">Version 1.0.0</p>
       </div>
